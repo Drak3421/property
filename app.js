@@ -232,7 +232,8 @@ function setupFirebaseListeners() {
         if (doc.exists) {
             renderStatsData(doc.data());
         } else {
-            db.collection("stats").doc("main").set(DEFAULT_STATS);
+            // UI fallback only - do not auto-write to prevent rules/revert conflicts
+            renderStatsData(DEFAULT_STATS);
         }
     }, error => console.error("Stats listener error:", error));
 
@@ -241,38 +242,24 @@ function setupFirebaseListeners() {
         if (doc.exists) {
             renderShopData(doc.data());
         } else {
-            db.collection("shop_info").doc("main").set(DEFAULT_SHOP);
+            // UI fallback only - do not auto-write to prevent rules/revert conflicts
+            renderShopData(DEFAULT_SHOP);
         }
     }, error => console.error("Shop info listener error:", error));
 
     // 3. Properties Listener
     db.collection("properties").onSnapshot((snapshot) => {
-        if (snapshot.empty) {
-            const batch = db.batch();
-            DEFAULT_SALE_PROPERTIES.forEach(p => {
-                const ref = db.collection("properties").doc(p.id);
-                batch.set(ref, { ...p, category: "sale", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-            });
-            DEFAULT_SOLD_PROPERTIES.forEach(p => {
-                const ref = db.collection("properties").doc(p.id);
-                batch.set(ref, { ...p, category: "sold", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-            });
-            batch.commit().then(() => {
-                console.log("Database seeded with default properties.");
-            });
-        } else {
-            globalProperties = [];
-            snapshot.forEach(doc => {
-                globalProperties.push({ id: doc.id, ...doc.data() });
-            });
-            
-            const activeFilter = document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all";
-            renderSaleProperties(activeFilter);
-            renderSoldProperties();
-            populatePropertySelect();
-            updateCMSListingsGridings();
-            updateStatsSummaryCounts();
-        }
+        globalProperties = [];
+        snapshot.forEach(doc => {
+            globalProperties.push({ id: doc.id, ...doc.data() });
+        });
+        
+        const activeFilter = document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all";
+        renderSaleProperties(activeFilter);
+        renderSoldProperties();
+        populatePropertySelect();
+        updateCMSListingsGridings();
+        updateStatsSummaryCounts();
     }, error => console.error("Properties listener error:", error));
 
     // 4. Reviews Listener
@@ -401,6 +388,9 @@ function renderSaleProperties(filterType) {
     let list;
     if (useFirebase) {
         list = globalProperties.filter(p => p.category === "sale");
+        if (globalProperties.length === 0) {
+            list = DEFAULT_SALE_PROPERTIES;
+        }
     } else {
         list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
     }
@@ -486,6 +476,9 @@ function renderSoldProperties() {
     let list;
     if (useFirebase) {
         list = globalProperties.filter(p => p.category === "sold");
+        if (globalProperties.length === 0) {
+            list = DEFAULT_SOLD_PROPERTIES;
+        }
     } else {
         list = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
     }
@@ -552,6 +545,9 @@ function populatePropertySelect() {
     let list;
     if (useFirebase) {
         list = globalProperties.filter(p => p.category === "sale");
+        if (globalProperties.length === 0) {
+            list = DEFAULT_SALE_PROPERTIES;
+        }
     } else {
         list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
     }
@@ -1041,7 +1037,7 @@ function setupCMSForms() {
             const updatedStats = { exp, sold, happy };
 
             if (useFirebase) {
-                db.collection("stats").doc("main").update(updatedStats).then(() => {
+                db.collection("stats").doc("main").set(updatedStats, { merge: true }).then(() => {
                     alert("Hero Statistics saved successfully!");
                 }).catch(error => {
                     console.error("Error updating stats:", error);
@@ -1073,7 +1069,7 @@ function setupCMSForms() {
             const updatedShop = { img, title, desc, address, hours, phone, email, license, map };
 
             if (useFirebase) {
-                db.collection("shop_info").doc("main").update(updatedShop).then(() => {
+                db.collection("shop_info").doc("main").set(updatedShop, { merge: true }).then(() => {
                     alert("Office details & location map updated successfully!");
                 }).catch(error => {
                     console.error("Error updating shop info:", error);
@@ -1190,6 +1186,10 @@ function updateCMSListingsGridings() {
     if (useFirebase) {
         saleList = globalProperties.filter(p => p.category === "sale");
         soldList = globalProperties.filter(p => p.category === "sold");
+        if (globalProperties.length === 0) {
+            saleList = DEFAULT_SALE_PROPERTIES;
+            soldList = DEFAULT_SOLD_PROPERTIES;
+        }
     } else {
         saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
         soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
