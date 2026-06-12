@@ -1,8 +1,44 @@
 // ==========================================
-// MAHADEV REAL ESTATE - INTERACTIVE LOGIC (CMS)
+// MAHADEV REAL ESTATE - INTERACTIVE LOGIC (CMS & FIREBASE SYNC)
 // ==========================================
 
-// --- DEFAULT FALLBACK DATA (If LocalStorage is empty) ---
+// --- FIREBASE CONFIGURATION ---
+// Paste your Firebase Config below to enable real-time cloud synchronization.
+// If apiKey is empty/placeholder, the app will fall back to local localStorage.
+const firebaseConfig = {
+    apiKey: "AIzaSyCwpGz5WAc9WXWcn5Wz3fmXam87Dxbyf88",
+    authDomain: "mahadev-real-estate.firebaseapp.com",
+    projectId: "mahadev-real-estate",
+    storageBucket: "mahadev-real-estate.firebasestorage.app",
+    messagingSenderId: "226410383769",
+    appId: "1:226410383769:web:9cf0ff12dbb34a1d9deb08"
+};
+
+let db = null;
+let useFirebase = false;
+
+// Global real-time arrays for Firestore data cache
+let globalProperties = [];
+let globalReviews = [];
+let globalInquiries = [];
+
+function initFirebase() {
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            useFirebase = true;
+            console.log("Firebase Firestore initialized successfully.");
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            useFirebase = false;
+        }
+    } else {
+        console.log("Firebase not configured. Falling back to browser LocalStorage.");
+    }
+}
+
+// --- DEFAULT FALLBACK DATA (If LocalStorage or Firestore is empty) ---
 const DEFAULT_STATS = {
     exp: "15+",
     sold: "500+",
@@ -100,7 +136,6 @@ function initStorage() {
         localStorage.setItem("mahadev_stats", JSON.stringify(DEFAULT_STATS));
     }
     
-    // Shop details migration check
     let shopData = localStorage.getItem("mahadev_shop");
     if (shopData) {
         let parsed = JSON.parse(shopData);
@@ -115,7 +150,6 @@ function initStorage() {
         localStorage.setItem("mahadev_shop", JSON.stringify(DEFAULT_SHOP));
     }
 
-    // Listings Address fields migration check (Sale listings)
     let saleData = localStorage.getItem("mahadev_sale_properties");
     if (saleData) {
         let parsed = JSON.parse(saleData);
@@ -135,7 +169,6 @@ function initStorage() {
         localStorage.setItem("mahadev_sale_properties", JSON.stringify(DEFAULT_SALE_PROPERTIES));
     }
 
-    // Listings Address fields migration check (Sold listings)
     let soldData = localStorage.getItem("mahadev_sold_properties");
     if (soldData) {
         let parsed = JSON.parse(soldData);
@@ -161,21 +194,24 @@ function initStorage() {
 
 // --- APP INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    initStorage();
+    initFirebase();
+    if (!useFirebase) {
+        initStorage();
+    }
     initApp();
 });
 
 function initApp() {
-    renderStats();
-    renderShop();
-    renderSaleProperties("all");
-    renderSoldProperties();
-    renderTestimonials();
-    populatePropertySelect();
-    applySavedBackground();
-    applySavedTheme();
-
-    setupHeaderScroll();
+    if (useFirebase) {
+        setupFirebaseListeners();
+    } else {
+        renderStats();
+        renderShop();
+        renderSaleProperties("all");
+        renderSoldProperties();
+        populatePropertySelect();
+        renderTestimonials();
+    }
     setupFilters();
     setupEnquiryForm();
     setupReviewSubmissionForm();
@@ -185,23 +221,88 @@ function initApp() {
     setupDashboardTabs();
     setupCMSForms();
     setupCMSListingsManager();
+    applySavedBackground();
+    applySavedTheme();
 }
 
-// --- HEADER SCROLL EFFECT ---
-function setupHeaderScroll() {
-    const header = document.querySelector(".glass-header");
-    window.addEventListener("scroll", () => {
-        if (window.scrollY > 50) {
-            header.classList.add("scrolled");
+// --- FIREBASE: REAL-TIME SYNC LISTENERS ---
+function setupFirebaseListeners() {
+    // 1. Stats Listener
+    db.collection("stats").doc("main").onSnapshot((doc) => {
+        if (doc.exists) {
+            renderStatsData(doc.data());
         } else {
-            header.classList.remove("scrolled");
+            db.collection("stats").doc("main").set(DEFAULT_STATS);
         }
-    });
+    }, error => console.error("Stats listener error:", error));
+
+    // 2. Shop Info Listener
+    db.collection("shop_info").doc("main").onSnapshot((doc) => {
+        if (doc.exists) {
+            renderShopData(doc.data());
+        } else {
+            db.collection("shop_info").doc("main").set(DEFAULT_SHOP);
+        }
+    }, error => console.error("Shop info listener error:", error));
+
+    // 3. Properties Listener
+    db.collection("properties").onSnapshot((snapshot) => {
+        if (snapshot.empty) {
+            const batch = db.batch();
+            DEFAULT_SALE_PROPERTIES.forEach(p => {
+                const ref = db.collection("properties").doc(p.id);
+                batch.set(ref, { ...p, category: "sale", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            });
+            DEFAULT_SOLD_PROPERTIES.forEach(p => {
+                const ref = db.collection("properties").doc(p.id);
+                batch.set(ref, { ...p, category: "sold", createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            });
+            batch.commit().then(() => {
+                console.log("Database seeded with default properties.");
+            });
+        } else {
+            globalProperties = [];
+            snapshot.forEach(doc => {
+                globalProperties.push({ id: doc.id, ...doc.data() });
+            });
+            
+            const activeFilter = document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all";
+            renderSaleProperties(activeFilter);
+            renderSoldProperties();
+            populatePropertySelect();
+            updateCMSListingsGridings();
+            updateStatsSummaryCounts();
+        }
+    }, error => console.error("Properties listener error:", error));
+
+    // 4. Reviews Listener
+    db.collection("reviews").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+        globalReviews = [];
+        snapshot.forEach(doc => {
+            globalReviews.push({ id: doc.id, ...doc.data() });
+        });
+        renderTestimonials();
+        updateReviewsDashboardTable();
+    }, error => console.error("Reviews listener error:", error));
+
+    // 5. Inquiries Listener
+    db.collection("inquiries").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+        globalInquiries = [];
+        snapshot.forEach(doc => {
+            globalInquiries.push({ id: doc.id, ...doc.data() });
+        });
+        updateInquiriesDashboardTable();
+        updateStatsSummaryCounts();
+    }, error => console.error("Inquiries listener error:", error));
 }
 
 // --- CMS: RENDER STATS ON HERO ---
 function renderStats() {
-    const stats = JSON.parse(localStorage.getItem("mahadev_stats"));
+    const stats = JSON.parse(localStorage.getItem("mahadev_stats")) || DEFAULT_STATS;
+    renderStatsData(stats);
+}
+
+function renderStatsData(stats) {
     const expSpan = document.getElementById("heroStatExp");
     const soldSpan = document.getElementById("heroStatSold");
     const happySpan = document.getElementById("heroStatHappy");
@@ -209,12 +310,23 @@ function renderStats() {
     if (expSpan) expSpan.textContent = stats.exp;
     if (soldSpan) soldSpan.textContent = stats.sold;
     if (happySpan) happySpan.textContent = stats.happy;
+
+    // Update Dashboard fields dynamically
+    const expInput = document.getElementById("statExpInput");
+    const soldInput = document.getElementById("statSoldInput");
+    const happyInput = document.getElementById("statHappyInput");
+    if (expInput && document.activeElement !== expInput) expInput.value = stats.exp;
+    if (soldInput && document.activeElement !== soldInput) soldInput.value = stats.sold;
+    if (happyInput && document.activeElement !== happyInput) happyInput.value = stats.happy;
 }
 
 // --- CMS: RENDER SHOP INFO, OWNER PHONE, EMAIL & LICENSE ---
 function renderShop() {
-    const shop = JSON.parse(localStorage.getItem("mahadev_shop"));
-    
+    const shop = JSON.parse(localStorage.getItem("mahadev_shop")) || DEFAULT_SHOP;
+    renderShopData(shop);
+}
+
+function renderShopData(shop) {
     const shopImg = document.getElementById("shopImage");
     const shopTitle = document.getElementById("shopTitleDisplay");
     const shopDesc = document.getElementById("shopDescDisplay");
@@ -256,6 +368,27 @@ function renderShop() {
     // Render Dynamic License Number
     const connectLicenseText = document.getElementById("connectLicenseText");
     if (connectLicenseText) connectLicenseText.textContent = shop.license || DEFAULT_SHOP.license;
+
+    // Update Dashboard fields dynamically
+    const shopPhoneInput = document.getElementById("shopPhoneInput");
+    const shopEmailInput = document.getElementById("shopEmailInput");
+    const shopLicenseInput = document.getElementById("shopLicenseInput");
+    const shopImgInput = document.getElementById("shopImgInput");
+    const shopTitleInput = document.getElementById("shopTitleInput");
+    const shopDescInput = document.getElementById("shopDescInput");
+    const shopAddressInput = document.getElementById("shopAddressInput");
+    const shopHoursInput = document.getElementById("shopHoursInput");
+    const shopMapInput = document.getElementById("shopMapInput");
+
+    if (shopPhoneInput && document.activeElement !== shopPhoneInput) shopPhoneInput.value = shop.phone || DEFAULT_SHOP.phone;
+    if (shopEmailInput && document.activeElement !== shopEmailInput) shopEmailInput.value = shop.email || DEFAULT_SHOP.email;
+    if (shopLicenseInput && document.activeElement !== shopLicenseInput) shopLicenseInput.value = shop.license || DEFAULT_SHOP.license;
+    if (shopImgInput && document.activeElement !== shopImgInput) shopImgInput.value = shop.img;
+    if (shopTitleInput && document.activeElement !== shopTitleInput) shopTitleInput.value = shop.title;
+    if (shopDescInput && document.activeElement !== shopDescInput) shopDescInput.value = shop.desc;
+    if (shopAddressInput && document.activeElement !== shopAddressInput) shopAddressInput.value = shop.address;
+    if (shopHoursInput && document.activeElement !== shopHoursInput) shopHoursInput.value = shop.hours;
+    if (shopMapInput && document.activeElement !== shopMapInput) shopMapInput.value = shop.map;
 }
 
 // --- RENDER PROPERTIES FOR SALE ---
@@ -264,7 +397,14 @@ function renderSaleProperties(filterType) {
     if (!grid) return;
 
     grid.innerHTML = "";
-    const list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+    
+    let list;
+    if (useFirebase) {
+        list = globalProperties.filter(p => p.category === "sale");
+    } else {
+        list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+    }
+
     const filtered = list.filter(p => filterType === "all" || p.type === filterType);
 
     if (filtered.length === 0) {
@@ -342,7 +482,13 @@ function renderSoldProperties() {
     if (!grid) return;
 
     grid.innerHTML = "";
-    const list = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    
+    let list;
+    if (useFirebase) {
+        list = globalProperties.filter(p => p.category === "sold");
+    } else {
+        list = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    }
 
     if (list.length === 0) {
         grid.innerHTML = `<div class="empty-slider-msg text-center" style="grid-column: 1/-1;">No sold properties listed in the archive yet.</div>`;
@@ -402,7 +548,13 @@ function populatePropertySelect() {
     if (!select) return;
 
     select.innerHTML = '<option value="General Enquiry">General Enquiry</option>';
-    const list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+    
+    let list;
+    if (useFirebase) {
+        list = globalProperties.filter(p => p.category === "sale");
+    } else {
+        list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+    }
 
     list.forEach(p => {
         const opt = document.createElement("option");
@@ -424,7 +576,12 @@ function renderTestimonials() {
     slider.innerHTML = "";
     dotsContainer.innerHTML = "";
 
-    const reviews = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+    let reviews;
+    if (useFirebase) {
+        reviews = globalReviews;
+    } else {
+        reviews = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+    }
 
     if (reviews.length === 0) {
         slider.innerHTML = `<div class="empty-slider-msg">No client reviews submitted yet. Use the review form below to share your experience!</div>`;
@@ -510,9 +667,22 @@ function setupReviewSubmissionForm() {
 
         const newReview = { name, property, avatar: "", rating, text };
 
-        let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
-        list.unshift(newReview);
-        localStorage.setItem("mahadev_reviews", JSON.stringify(list));
+        if (useFirebase) {
+            db.collection("reviews").add({
+                ...newReview,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                console.log("Review submitted to Firestore.");
+            }).catch(error => {
+                console.error("Error submitting review:", error);
+            });
+        } else {
+            let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+            list.unshift(newReview);
+            localStorage.setItem("mahadev_reviews", JSON.stringify(list));
+            renderTestimonials();
+            updateReviewsDashboardTable();
+        }
 
         form.classList.add("hidden");
         if (success) success.classList.remove("hidden");
@@ -522,9 +692,6 @@ function setupReviewSubmissionForm() {
             form.classList.remove("hidden");
             if (success) success.classList.add("hidden");
         }, 5000);
-
-        renderTestimonials();
-        updateReviewsDashboardTable();
     });
 }
 
@@ -545,9 +712,21 @@ function setupEnquiryForm() {
 
         const newEnquiry = { name, phone, property, message, date };
 
-        let list = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
-        list.unshift(newEnquiry);
-        localStorage.setItem("mahadev_enquiries", JSON.stringify(list));
+        if (useFirebase) {
+            db.collection("inquiries").add({
+                ...newEnquiry,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                console.log("Enquiry submitted to Firestore.");
+            }).catch(error => {
+                console.error("Error submitting enquiry:", error);
+            });
+        } else {
+            let list = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
+            list.unshift(newEnquiry);
+            localStorage.setItem("mahadev_enquiries", JSON.stringify(list));
+            updateInquiriesDashboardTable();
+        }
 
         form.classList.add("hidden");
         if (success) success.classList.remove("hidden");
@@ -557,8 +736,6 @@ function setupEnquiryForm() {
             form.classList.remove("hidden");
             if (success) success.classList.add("hidden");
         }, 5000);
-
-        updateInquiriesDashboardTable();
     });
 }
 
@@ -781,6 +958,8 @@ function setupDashboardTabs() {
 
 // --- CMS: UPDATE GENERAL EDIT FIELDS IN DASHBOARD ---
 function updateCMSEditorFields() {
+    if (useFirebase) return; // Managed in real-time listeners for Firebase
+
     const stats = JSON.parse(localStorage.getItem("mahadev_stats")) || DEFAULT_STATS;
     document.getElementById("statExpInput").value = stats.exp;
     document.getElementById("statSoldInput").value = stats.sold;
@@ -812,11 +991,20 @@ function setupCMSForms() {
             const happy = document.getElementById("statHappyInput").value.trim();
 
             const updatedStats = { exp, sold, happy };
-            localStorage.setItem("mahadev_stats", JSON.stringify(updatedStats));
 
-            renderStats();
-            updateStatsSummaryCounts();
-            alert("Hero Statistics saved successfully!");
+            if (useFirebase) {
+                db.collection("stats").doc("main").update(updatedStats).then(() => {
+                    alert("Hero Statistics saved successfully!");
+                }).catch(error => {
+                    console.error("Error updating stats:", error);
+                    alert("Error saving statistics.");
+                });
+            } else {
+                localStorage.setItem("mahadev_stats", JSON.stringify(updatedStats));
+                renderStats();
+                updateStatsSummaryCounts();
+                alert("Hero Statistics saved successfully!");
+            }
         });
     }
 
@@ -835,10 +1023,19 @@ function setupCMSForms() {
             const map = document.getElementById("shopMapInput").value.trim();
 
             const updatedShop = { img, title, desc, address, hours, phone, email, license, map };
-            localStorage.setItem("mahadev_shop", JSON.stringify(updatedShop));
 
-            renderShop();
-            alert("Office details & location map updated successfully!");
+            if (useFirebase) {
+                db.collection("shop_info").doc("main").update(updatedShop).then(() => {
+                    alert("Office details & location map updated successfully!");
+                }).catch(error => {
+                    console.error("Error updating shop info:", error);
+                    alert("Error saving office details.");
+                });
+            } else {
+                localStorage.setItem("mahadev_shop", JSON.stringify(updatedShop));
+                renderShop();
+                alert("Office details & location map updated successfully!");
+            }
         });
     }
 }
@@ -883,35 +1080,50 @@ function setupCMSListingsManager() {
             const baths = parseInt(document.getElementById("propBathsInput").value) || 0;
             const description = document.getElementById("propDescInput").value.trim();
 
-            const propertyObj = { id: id || "prop-" + Date.now(), title, category, price, type, image, area, address, beds, baths, description };
+            const finalId = id || "prop-" + Date.now();
+            const propertyObj = { id: finalId, title, category, price, type, image, area, address, beds, baths, description };
 
-            let saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
-            let soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
-
-            saleList = saleList.filter(p => p.id !== propertyObj.id);
-            soldList = soldList.filter(p => p.id !== propertyObj.id);
-
-            if (category === "sale") {
-                propertyObj.category = "sale";
-                saleList.unshift(propertyObj);
+            if (useFirebase) {
+                db.collection("properties").doc(finalId).set({
+                    ...propertyObj,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).then(() => {
+                    formContainer.classList.add("hidden");
+                    form.reset();
+                    alert("Property Listing saved successfully!");
+                }).catch(error => {
+                    console.error("Error saving property listing:", error);
+                    alert("Error saving property listing.");
+                });
             } else {
-                propertyObj.category = "sold";
-                soldList.unshift(propertyObj);
+                let saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+                let soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+
+                saleList = saleList.filter(p => p.id !== propertyObj.id);
+                soldList = soldList.filter(p => p.id !== propertyObj.id);
+
+                if (category === "sale") {
+                    propertyObj.category = "sale";
+                    saleList.unshift(propertyObj);
+                } else {
+                    propertyObj.category = "sold";
+                    soldList.unshift(propertyObj);
+                }
+
+                localStorage.setItem("mahadev_sale_properties", JSON.stringify(saleList));
+                localStorage.setItem("mahadev_sold_properties", JSON.stringify(soldList));
+
+                formContainer.classList.add("hidden");
+                form.reset();
+
+                renderSaleProperties("all");
+                renderSoldProperties();
+                populatePropertySelect();
+                updateCMSListingsGridings();
+                updateStatsSummaryCounts();
+
+                alert("Property Listing saved successfully!");
             }
-
-            localStorage.setItem("mahadev_sale_properties", JSON.stringify(saleList));
-            localStorage.setItem("mahadev_sold_properties", JSON.stringify(soldList));
-
-            formContainer.classList.add("hidden");
-            form.reset();
-
-            renderSaleProperties("all");
-            renderSoldProperties();
-            populatePropertySelect();
-            updateCMSListingsGridings();
-            updateStatsSummaryCounts();
-
-            alert("Property Listing saved successfully!");
         });
     }
 }
@@ -926,8 +1138,14 @@ function updateCMSListingsGridings() {
     saleCmsGrid.innerHTML = "";
     soldCmsGrid.innerHTML = "";
 
-    const saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
-    const soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    let saleList, soldList;
+    if (useFirebase) {
+        saleList = globalProperties.filter(p => p.category === "sale");
+        soldList = globalProperties.filter(p => p.category === "sold");
+    } else {
+        saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+        soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    }
 
     if (saleList.length === 0) {
         saleCmsGrid.innerHTML = `<p class="text-muted" style="padding:1rem;">No properties listed for sale.</p>`;
@@ -993,9 +1211,14 @@ function updateCMSListingsGridings() {
 }
 
 function editPropertyCms(id, cat) {
-    const list = cat === "sale" 
-        ? JSON.parse(localStorage.getItem("mahadev_sale_properties")) 
-        : JSON.parse(localStorage.getItem("mahadev_sold_properties"));
+    let list;
+    if (useFirebase) {
+        list = globalProperties;
+    } else {
+        list = cat === "sale" 
+            ? JSON.parse(localStorage.getItem("mahadev_sale_properties")) 
+            : JSON.parse(localStorage.getItem("mahadev_sold_properties"));
+    }
     
     const p = list.find(item => item.id === id);
     if (!p) return;
@@ -1019,21 +1242,30 @@ function editPropertyCms(id, cat) {
 }
 
 function deletePropertyCms(id, cat) {
-    if (cat === "sale") {
-        let list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
-        list = list.filter(item => item.id !== id);
-        localStorage.setItem("mahadev_sale_properties", JSON.stringify(list));
+    if (useFirebase) {
+        db.collection("properties").doc(id).delete().then(() => {
+            console.log("Listing deleted from Firestore.");
+        }).catch(error => {
+            console.error("Error deleting property:", error);
+            alert("Error deleting listing.");
+        });
     } else {
-        let list = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
-        list = list.filter(item => item.id !== id);
-        localStorage.setItem("mahadev_sold_properties", JSON.stringify(list));
-    }
+        if (cat === "sale") {
+            let list = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+            list = list.filter(item => item.id !== id);
+            localStorage.setItem("mahadev_sale_properties", JSON.stringify(list));
+        } else {
+            let list = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+            list = list.filter(item => item.id !== id);
+            localStorage.setItem("mahadev_sold_properties", JSON.stringify(list));
+        }
 
-    renderSaleProperties("all");
-    renderSoldProperties();
-    populatePropertySelect();
-    updateCMSListingsGridings();
-    updateStatsSummaryCounts();
+        renderSaleProperties("all");
+        renderSoldProperties();
+        populatePropertySelect();
+        updateCMSListingsGridings();
+        updateStatsSummaryCounts();
+    }
 }
 
 // --- CMS: INBOX INQUIRIES LOG TABLE ---
@@ -1043,7 +1275,12 @@ function updateInquiriesDashboardTable() {
     const clearInboxBtn = document.getElementById("clearInboxBtn");
     if (!tbody) return;
 
-    const inquiries = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
+    let inquiries;
+    if (useFirebase) {
+        inquiries = globalInquiries;
+    } else {
+        inquiries = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
+    }
 
     tbody.innerHTML = "";
 
@@ -1063,7 +1300,7 @@ function updateInquiriesDashboardTable() {
             <td><span class="badge badge-gold">${item.property}</span></td>
             <td>${item.message}</td>
             <td>
-                <button class="btn btn-danger btn-xs delete-enquiry-btn" data-index="${index}">Delete</button>
+                <button class="btn btn-danger btn-xs delete-enquiry-btn" data-index="${index}" data-id="${item.id || ''}">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -1071,21 +1308,32 @@ function updateInquiriesDashboardTable() {
 
     document.querySelectorAll(".delete-enquiry-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
-            const index = parseInt(e.currentTarget.getAttribute("data-index"));
-            let list = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
-            list.splice(index, 1);
-            localStorage.setItem("mahadev_enquiries", JSON.stringify(list));
-            updateInquiriesDashboardTable();
-            updateStatsSummaryCounts();
+            if (useFirebase) {
+                const id = e.currentTarget.getAttribute("data-id");
+                db.collection("inquiries").doc(id).delete();
+            } else {
+                const index = parseInt(e.currentTarget.getAttribute("data-index"));
+                let list = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
+                list.splice(index, 1);
+                localStorage.setItem("mahadev_enquiries", JSON.stringify(list));
+                updateInquiriesDashboardTable();
+                updateStatsSummaryCounts();
+            }
         });
     });
 
     if (clearInboxBtn) {
         clearInboxBtn.onclick = () => {
             if (confirm("Are you sure you want to clear all inquiries?")) {
-                localStorage.setItem("mahadev_enquiries", JSON.stringify([]));
-                updateInquiriesDashboardTable();
-                updateStatsSummaryCounts();
+                if (useFirebase) {
+                    globalInquiries.forEach(item => {
+                        db.collection("inquiries").doc(item.id).delete();
+                    });
+                } else {
+                    localStorage.setItem("mahadev_enquiries", JSON.stringify([]));
+                    updateInquiriesDashboardTable();
+                    updateStatsSummaryCounts();
+                }
             }
         };
     }
@@ -1098,7 +1346,12 @@ function updateReviewsDashboardTable() {
     const clearReviewsBtn = document.getElementById("clearReviewsBtn");
     if (!tbody) return;
 
-    const reviews = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+    let reviews;
+    if (useFirebase) {
+        reviews = globalReviews;
+    } else {
+        reviews = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+    }
 
     tbody.innerHTML = "";
 
@@ -1117,7 +1370,7 @@ function updateReviewsDashboardTable() {
             <td>${"⭐".repeat(parseInt(item.rating || 5))}</td>
             <td>${item.text}</td>
             <td>
-                <button class="btn btn-danger btn-xs delete-review-btn" data-index="${index}">Delete</button>
+                <button class="btn btn-danger btn-xs delete-review-btn" data-index="${index}" data-id="${item.id || ''}">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -1125,21 +1378,32 @@ function updateReviewsDashboardTable() {
 
     document.querySelectorAll(".delete-review-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
-            const index = parseInt(e.currentTarget.getAttribute("data-index"));
-            let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
-            list.splice(index, 1);
-            localStorage.setItem("mahadev_reviews", JSON.stringify(list));
-            updateReviewsDashboardTable();
-            renderTestimonials();
+            if (useFirebase) {
+                const id = e.currentTarget.getAttribute("data-id");
+                db.collection("reviews").doc(id).delete();
+            } else {
+                const index = parseInt(e.currentTarget.getAttribute("data-index"));
+                let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+                list.splice(index, 1);
+                localStorage.setItem("mahadev_reviews", JSON.stringify(list));
+                updateReviewsDashboardTable();
+                renderTestimonials();
+            }
         });
     });
 
     if (clearReviewsBtn) {
         clearReviewsBtn.onclick = () => {
             if (confirm("Are you sure you want to delete all reviews?")) {
-                localStorage.setItem("mahadev_reviews", JSON.stringify([]));
-                updateReviewsDashboardTable();
-                renderTestimonials();
+                if (useFirebase) {
+                    globalReviews.forEach(item => {
+                        db.collection("reviews").doc(item.id).delete();
+                    });
+                } else {
+                    localStorage.setItem("mahadev_reviews", JSON.stringify([]));
+                    updateReviewsDashboardTable();
+                    renderTestimonials();
+                }
             }
         };
     }
@@ -1151,9 +1415,16 @@ function updateStatsSummaryCounts() {
     const saleCountDisplay = document.getElementById("saleCountDisplay");
     const soldCountDisplay = document.getElementById("soldCountDisplay");
 
-    const inquiries = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
-    const saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
-    const soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    let inquiries, saleList, soldList;
+    if (useFirebase) {
+        inquiries = globalInquiries;
+        saleList = globalProperties.filter(p => p.category === "sale");
+        soldList = globalProperties.filter(p => p.category === "sold");
+    } else {
+        inquiries = JSON.parse(localStorage.getItem("mahadev_enquiries")) || [];
+        saleList = JSON.parse(localStorage.getItem("mahadev_sale_properties")) || [];
+        soldList = JSON.parse(localStorage.getItem("mahadev_sold_properties")) || [];
+    }
 
     if (totalEnquiriesCount) totalEnquiriesCount.textContent = inquiries.length;
     if (saleCountDisplay) saleCountDisplay.textContent = saleList.length;
