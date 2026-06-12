@@ -562,13 +562,14 @@ function setupEnquiryForm() {
     });
 }
 
-// --- MOBILE NAVIGATION MENU ---
+// --- NAVIGATION MENU DRAWER ---
 function setupMobileMenu() {
     const btn = document.getElementById("mobileMenuBtn");
     const menu = document.getElementById("navMenu");
     if (!btn || !menu) return;
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         menu.classList.toggle("active");
     });
 
@@ -578,6 +579,13 @@ function setupMobileMenu() {
             document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
             link.classList.add("active");
         });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+            menu.classList.remove("active");
+        }
     });
 }
 
@@ -626,6 +634,7 @@ function applySavedTheme() {
 // --- OWNER PANEL ACCESS CONTROL ---
 function setupOwnerPanel() {
     const openBtn = document.getElementById("openOwnerPanelBtn");
+    const menuOpenBtn = document.getElementById("menuOwnerPanelBtn");
     const passcodeModal = document.getElementById("passcodeModal");
     const dashboardModal = document.getElementById("ownerDashboardModal");
 
@@ -640,9 +649,7 @@ function setupOwnerPanel() {
 
     const TARGET_PASSCODE = "@Naman1234";
 
-    if (!openBtn) return;
-
-    openBtn.addEventListener("click", () => {
+    const handleOpenClick = () => {
         if (sessionStorage.getItem("mahadev_owner_auth") === "true") {
             showDashboard();
         } else {
@@ -651,7 +658,10 @@ function setupOwnerPanel() {
             authErrorMsg.classList.add("hidden");
             ownerPasscode.focus();
         }
-    });
+    };
+
+    if (openBtn) openBtn.addEventListener("click", handleOpenClick);
+    if (menuOpenBtn) menuOpenBtn.addEventListener("click", handleOpenClick);
 
     closePasscode.addEventListener("click", () => passcodeModal.classList.add("hidden"));
     closeDashboard.addEventListener("click", () => dashboardModal.classList.add("hidden"));
