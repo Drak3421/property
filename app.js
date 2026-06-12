@@ -651,6 +651,43 @@ function renderTestimonials() {
     testimonialInterval = setInterval(() => goToSlide(currentIndex + 1), 6000);
 }
 
+// Helper for client-side image resizing and compression
+function resizeImage(file, maxWidth, maxHeight, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Compress to JPEG with 0.7 quality to keep it under 15KB
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+            callback(dataUrl);
+        };
+        img.src = e.target.result;
+    };
+    reader.onerror = () => callback("");
+    reader.readAsDataURL(file);
+}
+
 // --- SUBMIT REVIEW FORM ---
 function setupReviewSubmissionForm() {
     const form = document.getElementById("publicReviewForm");
@@ -664,34 +701,45 @@ function setupReviewSubmissionForm() {
         const property = document.getElementById("revProperty").value.trim();
         const rating = document.getElementById("revRating").value;
         const text = document.getElementById("revText").value.trim();
+        const avatarFile = document.getElementById("revAvatar").files[0];
 
-        const newReview = { name, property, avatar: "", rating, text };
+        const proceedSubmission = (avatarBase64 = "") => {
+            const newReview = { name, property, avatar: avatarBase64, rating, text };
 
-        if (useFirebase) {
-            db.collection("reviews").add({
-                ...newReview,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                console.log("Review submitted to Firestore.");
-            }).catch(error => {
-                console.error("Error submitting review:", error);
+            if (useFirebase) {
+                db.collection("reviews").add({
+                    ...newReview,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    console.log("Review submitted to Firestore.");
+                }).catch(error => {
+                    console.error("Error submitting review:", error);
+                });
+            } else {
+                let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
+                list.unshift(newReview);
+                localStorage.setItem("mahadev_reviews", JSON.stringify(list));
+                renderTestimonials();
+                updateReviewsDashboardTable();
+            }
+
+            form.classList.add("hidden");
+            if (success) success.classList.remove("hidden");
+
+            setTimeout(() => {
+                form.reset();
+                form.classList.remove("hidden");
+                if (success) success.classList.add("hidden");
+            }, 5000);
+        };
+
+        if (avatarFile) {
+            resizeImage(avatarFile, 150, 150, (resizedDataUrl) => {
+                proceedSubmission(resizedDataUrl);
             });
         } else {
-            let list = JSON.parse(localStorage.getItem("mahadev_reviews")) || [];
-            list.unshift(newReview);
-            localStorage.setItem("mahadev_reviews", JSON.stringify(list));
-            renderTestimonials();
-            updateReviewsDashboardTable();
+            proceedSubmission("");
         }
-
-        form.classList.add("hidden");
-        if (success) success.classList.remove("hidden");
-
-        setTimeout(() => {
-            form.reset();
-            form.classList.remove("hidden");
-            if (success) success.classList.add("hidden");
-        }, 5000);
     });
 }
 
