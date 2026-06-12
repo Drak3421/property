@@ -329,7 +329,7 @@ body.light-theme .glass-header {
     top: 105%;
 }
 
-.nav-link {
+.nav-link, .nav-owner-btn, .nav-theme-btn {
     font-weight: 500;
     font-size: 0.95rem;
     color: var(--text-secondary);
@@ -340,23 +340,19 @@ body.light-theme .glass-header {
     align-items: center;
     width: 100%;
     cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    text-align: left;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover, .nav-link.active, .nav-owner-btn:hover, .nav-theme-btn:hover {
     color: var(--gold);
     background-color: var(--border-color);
 }
 
 .nav-link::after {
     display: none !important;
-}
-
-.nav-owner-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    text-align: left;
 }
 
 .header-actions {
@@ -1155,6 +1151,8 @@ body.light-theme .property-card:hover {
 .method-text {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .method-text span {
@@ -1165,6 +1163,8 @@ body.light-theme .property-card:hover {
 .method-text strong {
     font-size: 1.1rem;
     color: var(--text-primary);
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 /* Footer styling */
@@ -1564,14 +1564,17 @@ body.light-theme .property-card:hover {
         top: 105%;
     }
     .phone-btn span {
-        display: none;
+        display: none !important;
     }
     .phone-btn {
-        padding: 0.5rem;
-        border-radius: 50%;
+        padding: 0.5rem !important;
+        border-radius: 50% !important;
     }
     .container {
         padding: 0 1rem;
+    }
+    .logo {
+        font-size: 1.15rem !important;
     }
     .hero-content h1 {
         font-size: 2.2rem;
@@ -1584,6 +1587,9 @@ body.light-theme .property-card:hover {
         grid-template-columns: 1fr !important;
         gap: 1.5rem;
     }
+    .shop-grid, .contact-grid {
+        gap: 1.5rem !important;
+    }
     .shop-info-content,
     .contact-card,
     .connect-card,
@@ -1592,6 +1598,9 @@ body.light-theme .property-card:hover {
     }
     .map-iframe-container {
         min-height: 250px;
+    }
+    select {
+        max-width: 100%;
     }
     .form-row {
         grid-template-columns: 1fr;
@@ -1619,4 +1628,10 @@ body.light-theme .property-card:hover {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 360px) {
+    .logo {
+        font-size: 0.95rem !important;
+    }
 }

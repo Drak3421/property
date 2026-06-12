@@ -594,7 +594,14 @@ function setupThemeToggle() {
     const btn = document.getElementById("themeToggle");
     const moon = document.getElementById("moonIcon");
     const sun = document.getElementById("sunIcon");
+    const textLabel = document.getElementById("themeToggleText");
     if (!btn) return;
+
+    const updateLabel = (isLight) => {
+        if (textLabel) {
+            textLabel.textContent = isLight ? "Theme: Light Mode" : "Theme: Dark Mode";
+        }
+    };
 
     btn.addEventListener("click", () => {
         document.body.classList.toggle("light-theme");
@@ -610,6 +617,7 @@ function setupThemeToggle() {
             moon.classList.remove("hidden");
             sun.classList.add("hidden");
         }
+        updateLabel(isLight);
     });
 }
 
@@ -617,17 +625,20 @@ function applySavedTheme() {
     const saved = localStorage.getItem("mahadev_theme") || "dark";
     const moon = document.getElementById("moonIcon");
     const sun = document.getElementById("sunIcon");
+    const textLabel = document.getElementById("themeToggleText");
 
     if (saved === "light") {
         document.body.classList.remove("dark-theme");
         document.body.classList.add("light-theme");
         if (moon) moon.classList.add("hidden");
         if (sun) sun.classList.remove("hidden");
+        if (textLabel) textLabel.textContent = "Theme: Light Mode";
     } else {
         document.body.classList.remove("light-theme");
         document.body.classList.add("dark-theme");
         if (moon) moon.classList.remove("hidden");
         if (sun) sun.classList.add("hidden");
+        if (textLabel) textLabel.textContent = "Theme: Dark Mode";
     }
 }
 
