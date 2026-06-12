@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Welcome to Mahadev Real Estate - your trusted partner for luxury homes, commercial spaces, and premium properties. Browse properties for sale and sold listings.">
+    <title>Mahadev Real Estate | Luxury Properties & Premium Real Estate Services</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <!-- Header / Navigation -->
+    <header class="glass-header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <span class="logo-accent">Mahadev</span> Real Estate
+            </a>
+            <nav class="nav-menu" id="navMenu">
+                <a href="#hero" class="nav-link active">Home</a>
+                <a href="#shop" class="nav-link">Our Shop</a>
+                <a href="#sale-properties" class="nav-link">For Sale</a>
+                <a href="#sold-properties" class="nav-link">Sold Properties</a>
+                <a href="#testimonials" class="nav-link">Reviews</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <div class="header-actions">
+                <a href="#footer" class="go-to-bottom-header">Go to Bottom</a>
+                <a href="tel:+919876543210" class="phone-btn" id="headerPhoneBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-sm">
+                        <path fill-rule="evenodd" d="M1.5 4.5a3 3 0 0 1 3-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 0 1-.694 1.955l-1.293.97c-.135.101-.18.282-.108.43a13.56 13.56 0 0 0 5.08 5.08c.148.072.329.027.43-.108l.97-1.293a1.875 1.875 0 0 1 1.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 0 1-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5Z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="headerPhoneText">+91 98765 43210</span>
+                </a>
+                <button id="themeToggle" class="icon-btn" aria-label="Toggle Theme">
+                    <!-- Moon Icon -->
+                    <svg id="moonIcon" class="icon-md" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                    </svg>
+                    <!-- Sun Icon -->
+                    <svg id="sunIcon" class="icon-md hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21m8.966-8.966h-2.25m-13.5 0h-2.25m13.364-6.364-1.591 1.591M6.82 17.18l-1.591 1.591m12.728 0-1.591-1.591M6.82 6.82 5.229 5.23M12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z" />
+                    </svg>
+                </button>
+                <button id="mobileMenuBtn" class="icon-btn mobile-only" aria-label="Open Menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container with Dynamic Background Styling -->
+    <div id="dynamicBackground" class="bg-wrapper">
+        <div class="bg-overlay"></div>
+
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="container hero-content">
+                <span class="badge">ESTABLISHED & TRUSTED</span>
+                <h1>Find Your Sacred Space With <span class="gradient-text">Mahadev Real Estate</span></h1>
+                <p class="hero-subtitle">Premium properties, transparent transactions, and unmatched real estate expertise customized for your dreams.</p>
+                
+                <div class="hero-actions-row">
+                    <a href="#sale-properties" class="btn btn-primary">Browse Properties</a>
+                    <a href="#contact" class="btn btn-secondary">Book a Consultation</a>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="heroStatExp">15+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="heroStatSold">500+</span>
+                        <span class="stat-label">Properties Sold</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="heroStatHappy">98%</span>
+                        <span class="stat-label">Happy Clients</span>
+                    </div>
+                </div>
+            </div>
+            <a href="#shop" class="scroll-down" aria-label="Scroll Down">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-md bounce">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+            </a>
+        </section>
+
+        <!-- Our Shop Section -->
+        <section id="shop" class="section-padding">
+            <div class="container">
+                <div class="section-title text-center">
+                    <span class="section-subtitle">Visit Us Locally</span>
+                    <h2>Our Registered Shop & Office</h2>
+                    <p class="section-desc">Drop by our main office to have a warm cup of tea and discuss your next property investment face-to-face.</p>
+                </div>
+
+                <div class="shop-grid">
+                    <!-- Left: Shop Info & Image -->
+                    <div class="shop-card glass-panel animate-fade-in">
+                        <div class="shop-image-wrapper">
+                            <img src="assets/shop.jpg" id="shopImage" alt="Mahadev Real Estate Main Office Shop Front" onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'">
+                            <div class="image-overlay-badge">Main Office</div>
+                        </div>
+                        <div class="shop-info-content">
+                            <h3 id="shopTitleDisplay">Mahadev Real Estate Office</h3>
+                            <p class="shop-description" id="shopDescDisplay">
+                                Strategically located in the heart of the city, our office serves as a hub of excellence. For over a decade, we have welcomed buyers, sellers, and investors, providing them with reliable market guidance, documentation assistance, and luxury property consulting.
+                            </p>
+                            <ul class="shop-details-list">
+                                <li>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm text-gold">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                    </svg>
+                                    <span><strong>Address:</strong> <span id="shopAddressDisplay">Shop No. 12, Mahadev Arcade, Opp. City Plaza, Sector 4, Main Road</span></span>
+                                </li>
+                                <li>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm text-gold">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <span><strong>Hours:</strong> <span id="shopHoursDisplay">Mon - Sat: 9:30 AM to 8:30 PM | Sunday: By Appointment</span></span>
+                                </li>
+                                <li>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm text-gold">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.302a12.017 12.017 0 0 1-5.276-5.276c-.242-.44-.076-.927.302-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                                    </svg>
+                                    <span id="shopPhoneDisplay"><strong>Mobile:</strong> <a href="tel:+919876543210" class="link-hover" id="shopPhoneLink">+91 98765 43210</a> (Owner)</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right: Google Maps Integration -->
+                    <div class="map-card glass-panel animate-fade-in">
+                        <div class="map-header">
+                            <span class="map-title-wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm text-gold">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75h15m-15 3h15m-15 3h15m-15 3h15m-15 3h15M9 3h15M3 12h.008v.008H3V12Zm0 3h.008v.008H3V15Zm0 3h.008v.008H3V18Zm0-9h.008v.008H3V9Zm0-3h.008v.008H3V6Zm0-3H3.008v.008H3V3Z" />
+                                </svg>
+                                <span>Interactive Shop Location Map</span>
+                            </span>
+                            <span class="live-indicator"><span class="pulse-dot"></span> Live</span>
+                        </div>
+                        <div class="map-iframe-container" id="mapIframeContainer">
+                            <iframe 
+                                id="shopMapIframe"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14008.201416396903!2d77.216721!3d28.627221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b8d42d4d%3A0xe55685511cb0ff1a!2sConnaught%20Place%2C%20New%20Delhi%2C%20Delhi%20110001!5e0!3m2!1sen!2sin!4v1718167232231!5m2!1sen!2sin" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                aria-label="Google Map showing Mahadev Real Estate location">
+                            </iframe>
+                        </div>
+                        <div class="map-footer-hint">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-xs text-gold">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0Z" />
+                            </svg>
+                            <span>Need directions? Click map to navigate.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Properties for Sale Section -->
+        <section id="sale-properties" class="section-padding section-alt">
+            <div class="container">
+                <div class="section-header-flex">
+                    <div class="section-title">
+                        <span class="section-subtitle">Exclusive Catalog</span>
+                        <h2>Properties For Sale</h2>
+                    </div>
+                    <!-- Filtering controls -->
+                    <div class="filter-controls glass-panel">
+                        <button class="filter-btn active" data-filter="all">All Types</button>
+                        <button class="filter-btn" data-filter="villa">Villas</button>
+                        <button class="filter-btn" data-filter="apartment">Apartments</button>
+                        <button class="filter-btn" data-filter="commercial">Commercial</button>
+                    </div>
+                </div>
+
+                <!-- Properties Grid -->
+                <div class="property-grid" id="salePropertiesGrid">
+                    <!-- Javascript will dynamically populate cards here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Properties Sold Section -->
+        <section id="sold-properties" class="section-padding">
+            <div class="container">
+                <div class="section-title text-center">
+                    <span class="section-subtitle">Our Proven Track Record</span>
+                    <h2>Recently Sold Properties</h2>
+                    <p class="section-desc">Take a look at some of the premium properties we have successfully negotiated and sold for our satisfied clients.</p>
+                </div>
+
+                <!-- Sold Properties Grid -->
+                <div class="property-grid" id="soldPropertiesGrid">
+                    <!-- Javascript will dynamically populate sold cards here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="section-padding section-alt">
+            <div class="container">
+                <div class="section-title text-center">
+                    <span class="section-subtitle">Client Reviews</span>
+                    <h2>Word On The Street</h2>
+                </div>
+
+                <!-- Slider Area -->
+                <div class="slider-wrapper glass-panel" id="testimonialsWrapper">
+                    <button class="slider-arrow prev" id="sliderPrev" aria-label="Previous Testimonial">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-sm">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+                    
+                    <div class="testimonial-slider" id="testimonialSlider">
+                        <!-- Dynamic testimonials loaded by JS -->
+                    </div>
+
+                    <button class="slider-arrow next" id="sliderNext" aria-label="Next Testimonial">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-sm">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="slider-dots" id="sliderDots">
+                    <!-- Dots will be populated here -->
+                </div>
+
+                <!-- Write a Review Form -->
+                <div class="write-review-container glass-panel margin-top-md max-width-md center-block">
+                    <h3>Submit Your Review</h3>
+                    <p class="section-desc margin-top-xs text-center" style="margin-bottom: 1.5rem;">Have you bought or sold a property with Mahadev Real Estate? We value your feedback.</p>
+                    <form id="publicReviewForm" class="enquiry-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="revName">Your Name</label>
+                                <input type="text" id="revName" required placeholder="e.g. Anand Sharma">
+                            </div>
+                            <div class="form-group">
+                                <label for="revProperty">Property Details</label>
+                                <input type="text" id="revProperty" required placeholder="e.g. Bought Villa in Sector 5">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="revRating">Rating</label>
+                            <select id="revRating">
+                                <option value="5">⭐⭐⭐⭐⭐ (5 Star)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 Star)</option>
+                                <option value="3">⭐⭐⭐ (3 Star)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="revText">Your Review</label>
+                            <textarea id="revText" rows="3" required placeholder="Write your honest experience here..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary btn-block">Submit Feedback</button>
+                    </form>
+                    <div id="reviewSuccessMsg" class="form-success-alert hidden margin-top-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-md text-gold">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0Z" />
+                        </svg>
+                        <div>
+                            <h4>Review Submitted!</h4>
+                            <p>Thank you. Your review has been saved successfully.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section-padding">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Contact Form Card -->
+                    <div class="contact-card glass-panel animate-fade-in">
+                        <h3>Send an Enquiry</h3>
+                        <p class="contact-card-sub">Have questions or found a property you love? Let us know, and we will get back to you promptly.</p>
+                        
+                        <form id="enquiryForm" class="enquiry-form">
+                            <div class="form-group">
+                                <label for="clientName">Your Name</label>
+                                <input type="text" id="clientName" required placeholder="John Doe">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="clientPhone">Mobile Number</label>
+                                    <input type="tel" id="clientPhone" required placeholder="e.g. +91 99999 88888">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propertySelect">Property of Interest</label>
+                                    <select id="propertySelect">
+                                        <option value="General Enquiry">General Enquiry</option>
+                                        <!-- Dynamically updated by JS -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientMessage">Your Message</label>
+                                <textarea id="clientMessage" rows="4" required placeholder="Details about your budget, location requirements, or questions..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Submit Enquiry</button>
+                        </form>
+                        <div id="formSuccessMsg" class="form-success-alert hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-md text-gold">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0Z" />
+                            </svg>
+                            <div>
+                                <h4>Enquiry Sent Successfully!</h4>
+                                <p>Thank you. We will contact you on your mobile number shortly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Connect Info -->
+                    <div class="connect-card glass-panel animate-fade-in">
+                        <div class="connect-header">
+                            <span class="badge badge-gold">Quick Connect</span>
+                            <h3>Direct Contact details</h3>
+                            <p>Call us directly for immediate assistance. Owner is available for direct property consultations.</p>
+                        </div>
+                        <div class="connect-methods">
+                            <a href="tel:+919876543210" class="connect-method-item" id="connectPhoneBtn">
+                                <div class="method-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-6 18.75h12" />
+                                    </svg>
+                                </div>
+                                <div class="method-text">
+                                    <span>Call / WhatsApp Owner</span>
+                                    <strong id="connectPhoneText">+91 98765 43210</strong>
+                                </div>
+                            </a>
+                            <a href="mailto:contact@mahadevrealestate.com" class="connect-method-item" id="connectEmailLink">
+                                <div class="method-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                </div>
+                                <div class="method-text">
+                                    <span>Email Address</span>
+                                    <strong id="connectEmailText">contact@mahadevrealestate.com</strong>
+                                </div>
+                            </a>
+                            <div class="connect-method-item">
+                                <div class="method-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0110 21a3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.75 3.75 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0114 3c1.251 0 2.368.618 3.062 1.576a3.75 3.75 0 011.044 3.296A3.745 3.745 0 0121 12Z" />
+                                    </svg>
+                                </div>
+                                <div class="method-text">
+                                    <span>License Number</span>
+                                    <strong id="connectLicenseText">RERA REG NO: R-887/2012</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="footer" class="glass-footer">
+            <div class="container footer-content">
+                <div class="footer-left">
+                    <span class="footer-logo"><span class="logo-accent">Mahadev</span> Real Estate</span>
+                    <p class="footer-copy">&copy; 2026 Mahadev Real Estate. All Rights Reserved. Designed for Excellence.</p>
+                </div>
+                <div class="footer-right">
+                    <a href="#hero">Back to Top</a>
+                    <span class="divider">|</span>
+                    <button id="openOwnerPanelBtn" class="owner-panel-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-xs">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <span>Owner Panel</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Passcode Modal -->
+    <div id="passcodeModal" class="modal-overlay hidden">
+        <div class="modal-card glass-panel auth-card">
+            <div class="modal-header">
+                <h3>Owner Verification</h3>
+                <button class="close-modal-btn" id="closePasscodeBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Please enter the owner passcode to access the management panel.</p>
+                <div class="form-group margin-top-sm">
+                    <label for="ownerPasscode">Passcode</label>
+                    <input type="password" id="ownerPasscode" placeholder="Enter owner passcode...">
+                    <span id="authErrorMsg" class="error-text hidden">Incorrect passcode. Please try again.</span>
+                </div>
+                <button id="submitPasscodeBtn" class="btn btn-primary btn-block">Verify & Enter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Dashboard Modal -->
+    <div id="ownerDashboardModal" class="modal-overlay hidden">
+        <div class="modal-card glass-panel dashboard-card">
+            <div class="modal-header">
+                <h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md text-gold">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                    <span>Owner Panel Dashboard</span>
+                </h3>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+                    <button class="close-modal-btn" id="closeDashboardBtn">&times;</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Tab Navigation -->
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="inbox-tab">Client Inquiries</button>
+                <button class="tab-btn" data-tab="shop-stats-tab">Office & Stats</button>
+                <button class="tab-btn" data-tab="properties-tab">Listings Manager</button>
+                <button class="tab-btn" data-tab="reviews-tab">Client Reviews</button>
+                <button class="tab-btn" data-tab="customizer-tab">BG Theme</button>
+            </div>
+
+            <div class="modal-body dashboard-body">
+                
+                <!-- TAB 1: CLIENT ENQUIRIES -->
+                <div id="inbox-tab" class="tab-content">
+                    <div class="inbox-header">
+                        <h4>Client Enquiry Feedbacks</h4>
+                        <button id="clearInboxBtn" class="btn btn-danger btn-xs">Clear All Feedbacks</button>
+                    </div>
+                    
+                    <div class="inbox-table-container">
+                        <table class="inbox-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Client Name</th>
+                                    <th>Mobile Number</th>
+                                    <th>Property Interest</th>
+                                    <th>Enquiry Message</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inboxTableBody">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                        <div id="emptyInboxMsg" class="empty-inbox-message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="icon-lg text-muted">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V19.5z" />
+                            </svg>
+                            <p>No enquiries received yet. All new client enquiries will appear here instantly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: OFFICE & HERO STATS -->
+                <div id="shop-stats-tab" class="tab-content hidden">
+                    <div class="cms-editor-grid">
+                        <!-- Left: Stats Editing -->
+                        <div class="glass-panel-inner editor-panel">
+                            <h4>Edit Hero Stats</h4>
+                            <p class="setting-desc">Modify the key statistics shown in the hero section of the landing page.</p>
+                            
+                            <form id="cmsStatsForm" class="enquiry-form">
+                                <div class="form-group">
+                                    <label for="statExpInput">Years of Experience</label>
+                                    <input type="text" id="statExpInput" required placeholder="e.g. 15+">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statSoldInput">Properties Sold Count</label>
+                                    <input type="text" id="statSoldInput" required placeholder="e.g. 500+">
+                                </div>
+                                <div class="form-group">
+                                    <label for="statHappyInput">Happy Clients %</label>
+                                    <input type="text" id="statHappyInput" required placeholder="e.g. 98%">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm margin-top-xs">Save Stats</button>
+                            </form>
+                        </div>
+
+                        <!-- Right: Shop Info Editing -->
+                        <div class="glass-panel-inner editor-panel">
+                            <h4>Edit Main Office & Location</h4>
+                            <p class="setting-desc">Update details for the registered shop photo, description, operational hours, address and Google Maps location.</p>
+                            
+                            <form id="cmsShopForm" class="enquiry-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="shopPhoneInput">Owner Mobile Number</label>
+                                        <input type="tel" id="shopPhoneInput" required placeholder="+91 98765 43210">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shopEmailInput">Owner Email Address</label>
+                                        <input type="email" id="shopEmailInput" required placeholder="contact@mahadevrealestate.com">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="shopLicenseInput">RERA/License Number</label>
+                                        <input type="text" id="shopLicenseInput" required placeholder="RERA REG NO: R-887/2012">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shopImgInput">Office Shop Photo URL</label>
+                                        <input type="text" id="shopImgInput" required placeholder="e.g. assets/shop.jpg">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shopTitleInput">Office Header Title</label>
+                                    <input type="text" id="shopTitleInput" required placeholder="Mahadev Real Estate Office">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shopDescInput">Office Description</label>
+                                    <textarea id="shopDescInput" rows="3" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shopAddressInput">Office Registered Address</label>
+                                    <input type="text" id="shopAddressInput" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shopHoursInput">Operational Hours</label>
+                                    <input type="text" id="shopHoursInput" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shopMapInput">Google Maps Embed link (src URL in Iframe)</label>
+                                    <input type="text" id="shopMapInput" required placeholder="https://www.google.com/maps/embed?...">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm margin-top-xs">Save Office Details</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: PROPERTIES LISTINGS MANAGER -->
+                <div id="properties-tab" class="tab-content hidden">
+                    <div class="cms-listings-header">
+                        <h4>Manage Listed Properties</h4>
+                        <button class="btn btn-primary btn-xs" id="addNewPropertyBtn">+ Add New Property</button>
+                    </div>
+
+                    <!-- Add/Edit Property Form Modal Sub-View (Hidden by default) -->
+                    <div id="propertyEditFormContainer" class="glass-panel-inner margin-top-sm margin-bottom-md hidden">
+                        <h4 id="propertyFormTitle">Add New Listed Property</h4>
+                        <form id="propertyEditForm" class="enquiry-form margin-top-sm">
+                            <input type="hidden" id="propIdInput">
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propTitleInput">Property Title</label>
+                                    <input type="text" id="propTitleInput" required placeholder="e.g. Kailash Luxury Mansion">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propCategoryInput">Listing Category</label>
+                                    <select id="propCategoryInput">
+                                        <option value="sale">For Sale</option>
+                                        <option value="sold">Sold Archive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propPriceInput">Price Display</label>
+                                    <input type="text" id="propPriceInput" required placeholder="e.g. ₹3.50 Cr or ₹95 Lakhs">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propTypeInput">Property Type</label>
+                                    <select id="propTypeInput">
+                                        <option value="villa">Villa</option>
+                                        <option value="apartment">Apartment</option>
+                                        <option value="commercial">Commercial Space</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propImgUrlInput">Property Image URL/Path</label>
+                                    <input type="text" id="propImgUrlInput" required placeholder="e.g. assets/property-sale-1.jpg">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propAreaInput">Total Area</label>
+                                    <input type="text" id="propAreaInput" required placeholder="e.g. 3,200 sq ft">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="propAddressInput">Property Address / Location</label>
+                                <input type="text" id="propAddressInput" required placeholder="e.g. Sector 4, Main Road, City Centre">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="propBedsInput">Bedrooms Count (0 for Commercial)</label>
+                                    <input type="number" id="propBedsInput" min="0" required value="3">
+                                </div>
+                                <div class="form-group">
+                                    <label for="propBathsInput">Bathrooms Count</label>
+                                    <input type="number" id="propBathsInput" min="0" required value="3">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="propDescInput">Property Description</label>
+                                <textarea id="propDescInput" rows="2" required placeholder="Write listing highlights..."></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <button type="submit" class="btn btn-primary btn-sm">Save Listing</button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="cancelPropertyEditBtn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Properties CMS Grid -->
+                    <div class="cms-listings-grid-wrapper">
+                        <h5>Properties for Sale</h5>
+                        <div class="cms-list-grid" id="cmsSaleListingsGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                        
+                        <h5 class="margin-top-md">Sold Properties Archive</h5>
+                        <div class="cms-list-grid" id="cmsSoldListingsGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: CLIENT REVIEWS MANAGER -->
+                <div id="reviews-tab" class="tab-content hidden">
+                    <div class="inbox-header">
+                        <h4>Client Reviews Manager</h4>
+                        <button id="clearReviewsBtn" class="btn btn-danger btn-xs">Clear All Reviews</button>
+                    </div>
+
+                    <div class="inbox-table-container">
+                        <table class="inbox-table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Property Traded</th>
+                                    <th>Rating</th>
+                                    <th>Review Text</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviewsTableBody">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                        <div id="emptyReviewsMsg" class="empty-inbox-message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="icon-lg text-muted">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499c-.107-.218-.284-.405-.512-.512a1.24 1.24 0 00-1.64.456l-3.5 6a1.25 1.25 0 00.354 1.764l3.5 2.228a1.25 1.25 0 001.763-.355l3.5-6a1.25 1.25 0 00-.465-1.581l-3-2.001zm0 0l-3 2M12 18.75a6 6 0 100-12 6 6 0 000 12z" />
+                            </svg>
+                            <p>No reviews submitted yet. Use the review form on the main page to write reviews.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: DYNAMIC BACKGROUND CUSTOMIZER -->
+                <div id="customizer-tab" class="tab-content hidden">
+                    <div class="setting-box glass-panel-inner">
+                        <h4>Website Theme Background Customizer</h4>
+                        <p class="setting-desc">Change the background image or styling of the website. Select a premium preset or enter a custom photo URL.</p>
+                        
+                        <div class="bg-presets">
+                            <button class="preset-btn" data-bg="gradient1" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);" title="Midnight Indigo"></button>
+                            <button class="preset-btn" data-bg="gradient2" style="background: linear-gradient(135deg, #090d16 0%, #111827 100%);" title="Obsidian Slate"></button>
+                            <button class="preset-btn" data-bg="image-luxury-villa" style="background-image: url('assets/hero-bg.jpg'); background-size: cover;" title="Luxury Sunset Villa"></button>
+                            <button class="preset-btn" data-bg="image-dark-abstract" style="background-image: url('assets/dark-abstract-bg.png'); background-size: cover;" title="Dark Gold Abstract"></button>
+                            <button class="preset-btn" data-bg="image-black-gold" style="background-image: url('assets/black-gold-bg.png'); background-size: cover;" title="Black Gold Abstract"></button>
+                        </div>
+
+                        <div class="form-group margin-top-sm">
+                            <label for="customBgUrl">Custom Background Image URL</label>
+                            <div class="input-inline-btn">
+                                <input type="url" id="customBgUrl" placeholder="https://images.unsplash.com/...">
+                                <button id="applyCustomBgBtn" class="btn btn-primary">Apply</button>
+                            </div>
+                        </div>
+                        <button id="resetBgBtn" class="btn btn-secondary btn-xs margin-top-xs">Reset to Default</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Main JavaScript File -->
+    <script src="app.js"></script>
+</body>
+</html>
