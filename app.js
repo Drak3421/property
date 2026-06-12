@@ -40,9 +40,9 @@ function initFirebase() {
 
 // --- DEFAULT FALLBACK DATA (If LocalStorage or Firestore is empty) ---
 const DEFAULT_STATS = {
-    exp: "15+",
-    sold: "500+",
-    happy: "98%"
+    exp: "10+",
+    sold: "10+",
+    happy: "99%"
 };
 
 const DEFAULT_SHOP = {
@@ -51,10 +51,10 @@ const DEFAULT_SHOP = {
     desc: "Strategically located in the heart of the city, our office serves as a hub of excellence. For over a decade, we have welcomed buyers, sellers, and investors, providing them with reliable market guidance, documentation assistance, and luxury property consulting.",
     address: "Shop No. 12, Mahadev Arcade, Opp. City Plaza, Sector 4, Main Road",
     hours: "Mon - Sat: 9:30 AM to 8:30 PM | Sunday: By Appointment",
-    phone: "+91 98765 43210",
+    phone: "+91 99926 76777",
     email: "contact@mahadevrealestate.com",
     license: "RERA REG NO: R-887/2012",
-    map: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14008.201416396903!2d77.216721!3d28.627221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b8d42d4d%3A0xe55685511cb0ff1a!2sConnaught%20Place%2C%20New%20Delhi%2C%20Delhi%20110001!5e0!3m2!1sen!2sin!4v1718167232231!5m2!1sen!2sin"
+    map: "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1243.1946254040429!2d76.63315214494723!3d28.19864032113139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1781264002004!5m2!1sen!2sin"
 };
 
 const DEFAULT_SALE_PROPERTIES = [
@@ -132,7 +132,17 @@ const DEFAULT_SOLD_PROPERTIES = [
 
 // --- INITIALIZE DATA IN LOCAL STORAGE ---
 function initStorage() {
-    if (!localStorage.getItem("mahadev_stats")) {
+    let statsData = localStorage.getItem("mahadev_stats");
+    if (statsData) {
+        let parsedStats = JSON.parse(statsData);
+        // Migrate old default values if they are still unchanged in client's local storage
+        if (parsedStats.exp === "15+" || parsedStats.sold === "500+" || parsedStats.happy === "98%") {
+            if (parsedStats.exp === "15+") parsedStats.exp = DEFAULT_STATS.exp;
+            if (parsedStats.sold === "500+") parsedStats.sold = DEFAULT_STATS.sold;
+            if (parsedStats.happy === "98%") parsedStats.happy = DEFAULT_STATS.happy;
+            localStorage.setItem("mahadev_stats", JSON.stringify(parsedStats));
+        }
+    } else {
         localStorage.setItem("mahadev_stats", JSON.stringify(DEFAULT_STATS));
     }
     
@@ -143,6 +153,12 @@ function initStorage() {
         if (!parsed.phone) { parsed.phone = DEFAULT_SHOP.phone; modified = true; }
         if (!parsed.email) { parsed.email = DEFAULT_SHOP.email; modified = true; }
         if (!parsed.license) { parsed.license = DEFAULT_SHOP.license; modified = true; }
+        // Migrate old default map url
+        const oldMapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14008.201416396903!2d77.216721!3d28.627221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b8d42d4d%3A0xe55685511cb0ff1a!2sConnaught%20Place%2C%20New%20Delhi%2C%20Delhi%20110001!5e0!3m2!1sen!2sin!4v1718167232231!5m2!1sen!2sin";
+        if (parsed.map === oldMapUrl || !parsed.map) {
+            parsed.map = DEFAULT_SHOP.map;
+            modified = true;
+        }
         if (modified) {
             localStorage.setItem("mahadev_shop", JSON.stringify(parsed));
         }
@@ -230,7 +246,17 @@ function setupFirebaseListeners() {
     // 1. Stats Listener
     db.collection("stats").doc("main").onSnapshot((doc) => {
         if (doc.exists) {
-            renderStatsData(doc.data());
+            const data = doc.data();
+            // Auto-migrate old default stats if they exist in Firestore
+            if (data.exp === "15+" || data.sold === "500+" || data.happy === "98%") {
+                const updated = { ...data };
+                if (updated.exp === "15+") updated.exp = DEFAULT_STATS.exp;
+                if (updated.sold === "500+") updated.sold = DEFAULT_STATS.sold;
+                if (updated.happy === "98%") updated.happy = DEFAULT_STATS.happy;
+                db.collection("stats").doc("main").set(updated, { merge: true })
+                    .catch(err => console.error("Firestore stats auto-migration failed:", err));
+            }
+            renderStatsData(data);
         } else {
             // UI fallback only - do not auto-write to prevent rules/revert conflicts
             renderStatsData(DEFAULT_STATS);
@@ -240,7 +266,15 @@ function setupFirebaseListeners() {
     // 2. Shop Info Listener
     db.collection("shop_info").doc("main").onSnapshot((doc) => {
         if (doc.exists) {
-            renderShopData(doc.data());
+            const data = doc.data();
+            const oldMapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14008.201416396903!2d77.216721!3d28.627221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd37b8d42d4d%3A0xe55685511cb0ff1a!2sConnaught%20Place%2C%20New%20Delhi%2C%20Delhi%20110001!5e0!3m2!1sen!2sin!4v1718167232231!5m2!1sen!2sin";
+            // Auto-migrate old map URL to the new one if stored in Firestore
+            if (data.map === oldMapUrl || !data.map) {
+                const updated = { ...data, map: DEFAULT_SHOP.map };
+                db.collection("shop_info").doc("main").set(updated, { merge: true })
+                    .catch(err => console.error("Firestore shop map auto-migration failed:", err));
+            }
+            renderShopData(data);
         } else {
             // UI fallback only - do not auto-write to prevent rules/revert conflicts
             renderShopData(DEFAULT_SHOP);
